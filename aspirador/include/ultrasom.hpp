@@ -8,7 +8,9 @@ public:
     Ultrasom(int trigPin, int echoPin);
     void setup();
     float medirDistancia();
-    bool detectarObjeto(float distanciaLimite);
+    bool detectarObstaculoDireita(float distanciaLimite);
+    bool detectarObstaculoEsquerda(float distanciaLimite);
+    bool detectarObstaculoMeio(float distanciaLimite);
 
 private:
     int trigPin;

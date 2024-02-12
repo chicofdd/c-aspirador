@@ -3,12 +3,9 @@
 #include <NewPing.h>
 #include "ultrasom.hpp"
 #include "rodas.hpp"
-
-// #include "infravermelhos.hpp";
+#include "infravermelhos.hpp"
 // #include "carregamento.hpp"
 // #include "aspiração.hpp"
-
-
 
 
 // Definição dos pinos para os motores e ponte H L298N
@@ -20,55 +17,41 @@ const int in3Pin = 6;   // Pino IN3
 const int in4Pin = 7;   // Pino IN4
 
 // Definição dos pinos para os sensores ultrassônicos
-const int trigPin1 = 8;
-const int echoPin1 = 9;
-const int trigPin2 = 10;
-const int echoPin2 = 11;
-const int trigPin3 = 12;
-const int echoPin3 = 13;
+const int trigPinDireita = 9;
+const int echoPinDireita = 8;
+const int trigPinMeio = 11;
+const int echoPinMeio = 10;
+const int trigPinEsquerda = 13;
+const int echoPinEsquerda = 12;
 
-// Objeto da classe Rodas
+const int infravermelhoPin = A0;
+
 Rodas rodas(enaPin, in1Pin, in2Pin, enbPin, in3Pin, in4Pin);
-
-// Objetos da classe Ultrasom
-Ultrasom ultrassomDireita(trigPin1, echoPin1);
-Ultrasom ultrassomMeio(trigPin2, echoPin2);
-Ultrasom ultrassomEsquerda(trigPin3, echoPin3);
+Ultrasom ultrassomDireita(trigPinDireita, echoPinDireita);
+Ultrasom ultrassomMeio(trigPinMeio, echoPinMeio);
+Ultrasom ultrassomEsquerda(trigPinEsquerda, echoPinEsquerda);
+Infravermelho infravermelho(infravermelhoPin);
 
 void setup() {
-    // Inicializa os pinos dos sensores ultrassônicos
+    rodas.setup();
     ultrassomDireita.setup();
     ultrassomMeio.setup();
     ultrassomEsquerda.setup();
-
-    // Inicializa os pinos dos motores
-    rodas.setup();
+    infravermelho.setup();
 }
 
 void loop() {
-    // Verifica se há obstáculos detectados pelos sensores
-    bool obstaculoDireita = ultrassomDireita.detectarObjeto(20); // 20 cm de distância limite
-    bool obstaculoMeio = ultrassomMeio.detectarObjeto(20);
-    bool obstaculoEsquerda = ultrassomEsquerda.detectarObjeto(20);
+    bool obstaculoDireita = ultrassomDireita.detectarObstaculoDireita(5); // 5 cm de distância limite
+    bool obstaculoMeio = ultrassomMeio.detectarObstaculoMeio(5);
+    bool obstaculoEsquerda = ultrassomEsquerda.detectarObstaculoEsquerda(5);
+    
+    float diferencaAltura = infravermelho.medirDistancia();
 
-    // Se houver obstáculo à direita, girar para a esquerda
-    if (obstaculoDireita) {
-        rodas.parar(); // Parar os motores
-        rodas.girarEsquerda(1000); // Girar por 1 segundo
-    }
-    // Se houver obstáculo no meio, parar
-    else if (obstaculoMeio) {
-        rodas.parar(); // Parar os motores
-    }
-    // Se houver obstáculo à esquerda, girar para a direita
-    else if (obstaculoEsquerda) {
-        rodas.parar(); // Parar os motores
-        rodas.girarDireita(1000); // Girar por 1 segundo
-    }
-    // Se não houver obstáculos, avançar
-    else {
-        rodas.frente(1000); // Avançar por 1 segundo
+    if (obstaculoDireita || obstaculoMeio || obstaculoEsquerda || diferencaAltura > 10) {
+        rodas.parar();
+    } else {
+        rodas.frente(1000);
     }
 
-    // Outras ações podem ser adicionadas aqui conforme necessário
+    delay(100); // Pequena pausa entre as verificações
 }

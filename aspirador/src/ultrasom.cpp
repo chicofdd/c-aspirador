@@ -24,7 +24,19 @@ float Ultrasom::medirDistancia() {
     return distance;
 }
 
-bool Ultrasom::detectarObjeto(float distanciaLimite) {
+bool Ultrasom::detectarObstaculoDireita(float distanciaLimite) {
+    float distancia = medirDistancia();
+    return (distancia < distanciaLimite);
+}
+
+bool Ultrasom::detectarObstaculoEsquerda(float distanciaLimite) {
+    // Medir a distância usando o sensor esquerdo
+    float distancia = medirDistancia();
+    return (distancia < distanciaLimite);
+}
+
+bool Ultrasom::detectarObstaculoMeio(float distanciaLimite) {
+    // Medir a distância usando o sensor do meio
     float distancia = medirDistancia();
     return (distancia < distanciaLimite);
 }
